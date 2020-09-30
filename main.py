@@ -10,16 +10,16 @@ logger.addHandler(handler)
 
 logger.setLevel(logging.DEBUG)
 
-x = PTU("129.219.136.149", 4000)
+x = PTU("192.168.0.110", 4000)
 x.connect()
 
-value = 3
+value = 1
 
 if value == 1:
     x.pan(25)
     print(x.pan())
 elif value == 2:
-    x.pan_angle(45)
+    x.pan_angle(90)
     print(x.pan())
 elif value == 3:
     x.pan_offset(-10)

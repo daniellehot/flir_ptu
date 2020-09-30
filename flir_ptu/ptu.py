@@ -37,15 +37,15 @@ The syntax for adding a new command to the ptu class is
 
 cmds = {
     "pan": {
-        "set": [lambda pos: "pp" + str(pos), True, False],
+        "set": [lambda pos: "pp" + str(pos), False, False],
         "get": ["pp",
-                r"\sCurrent Pan position is (?P<expected>-?\d+)\r\n"
+                r"\s(?P<expected> ?\d+)\r\n"
                 ]
     },
     "tilt": {
-        "set": [lambda pos: "tp" + str(pos), True, False],
+        "set": [lambda pos: "tp" + str(pos), False, False],
         "get": ["tp",
-                r"\sCurrent Tilt position is (?P<expected>-?\d+)\r\n"
+                r"\s(?P<expected> ?\d+)\r\n"
                 ]
     },
     "pan_offset": {
@@ -54,7 +54,7 @@ cmds = {
                 lambda self, pos: int(self.pan()) + pos
                 ],
         "get": ["po",
-                r"\sTarget Pan position is (?P<expected>-?\d+)\r\n"
+                r"\s(?P<expected> ?\d+)\r\n"
                 ]
     },
     "tilt_offset": {
@@ -63,7 +63,7 @@ cmds = {
                 lambda self, pos: int(self.tilt()) + pos
                 ],
         "get": ["to",
-                r"\sTarget Tilt position is (?P<expected>-?\d+)\r\n"
+                r"\s(?P<expected> ?\d+)\r\n"
                 ]
     }
 }
@@ -131,6 +131,7 @@ class PTU:
         data = self.stream.read_until("*").decode()
         data = self.stream.read_until("\n").decode()
         match = re.match(regex, data)
+        print(data)
         if match:
             return match.group("expected")
         else:
