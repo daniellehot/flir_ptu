@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flir_ptu.ptu import PTU
 import logging
 
@@ -13,13 +15,13 @@ logger.setLevel(logging.DEBUG)
 x = PTU("192.168.0.110", 4000)
 x.connect()
 
-value = 1
+value = 2
 
 if value == 1:
     x.pan(25)
     print(x.pan())
 elif value == 2:
-    x.pan_angle(90)
+    x.pan_angle(45)
     print(x.pan())
 elif value == 3:
     x.pan_offset(-10)

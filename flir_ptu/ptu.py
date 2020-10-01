@@ -37,13 +37,13 @@ The syntax for adding a new command to the ptu class is
 
 cmds = {
     "pan": {
-        "set": [lambda pos: "pp" + str(pos), False, False],
+        "set": [lambda pos: "pp" + str(pos), True, False],
         "get": ["pp",
                 r"\s(?P<expected> ?\d+)\r\n"
                 ]
     },
     "tilt": {
-        "set": [lambda pos: "tp" + str(pos), False, False],
+        "set": [lambda pos: "tp" + str(pos), True, False],
         "get": ["tp",
                 r"\s(?P<expected> ?\d+)\r\n"
                 ]
