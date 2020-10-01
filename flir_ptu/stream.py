@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from telnetlib import Telnet
 from enum import IntEnum
-import logging
-
-
-logger = logging.getLogger(__name__)
+from vision_utils.logger import get_logger
+logger =  get_logger()
 
 
 class ConnectionState(IntEnum):
@@ -63,7 +61,7 @@ class Stream:
         self.socket.close()
 
     def send(self, cmd):
-        logger.debug(cmd)
+        # logger.debug(cmd)
         if self.testing:
             return
 

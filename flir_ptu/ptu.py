@@ -3,10 +3,8 @@ import re
 import time
 import math
 from flir_ptu.stream import Stream
-import logging
-
-
-logger = logging.getLogger(__name__)
+from vision_utils.logger import get_logger
+logger =  get_logger()
 
 """
 The below are the config definitions that are used to autogenerate and add
@@ -36,34 +34,64 @@ The syntax for adding a new command to the ptu class is
 """
 
 cmds = {
+    "wait": {
+        "set": [lambda pos: "a", False, False],
+        "get": ["a",
+                r"(?P<expected>.*)\r\n"
+                ]
+    },
+    "reset": {
+        "set": [lambda pos: "r", False, False],
+        "get": ["r",
+                r"(?P<expected>.*)\r\n"
+                ]
+    },
     "pan": {
-        "set": [lambda pos: "pp" + str(pos), True, False],
+        "set": [lambda pos: "pp" + str(pos), False, False],
         "get": ["pp",
-                r"\s(?P<expected> ?\d+)\r\n"
+                r"\s*(?P<expected>-*?\d+)\r\n"
+                ]
+    },
+    "pan_speed": {
+        "set": [lambda pos: "ps" + str(pos), False, False],
+        "get": ["ps",
+                r"\s*(?P<expected>-*?\d+)\r\n"
+                ]
+    },
+    "pan_speed_max": {
+        "set": [lambda pos: "pu" + str(pos), False, False],
+        "get": ["pu",
+                r"\s*(?P<expected>-*?\d+)\r\n"
+                ]
+    },
+    "pan_accel": {
+        "set": [lambda pos: "pa" + str(pos), False, False],
+        "get": ["pa",
+                r"\s*(?P<expected>-*?\d+)\r\n"
                 ]
     },
     "tilt": {
-        "set": [lambda pos: "tp" + str(pos), True, False],
+        "set": [lambda pos: "tp" + str(pos), False, False],
         "get": ["tp",
-                r"\s(?P<expected> ?\d+)\r\n"
+                r"\s*(?P<expected>-*?\d+)\r\n"
                 ]
     },
     "pan_offset": {
         "set": [lambda pos: "po" + str(pos),
-                True,
+                False,
                 lambda self, pos: int(self.pan()) + pos
                 ],
         "get": ["po",
-                r"\s(?P<expected> ?\d+)\r\n"
+                r"\s*(?P<expected>-*?\d+)\r\n"
                 ]
     },
     "tilt_offset": {
         "set": [lambda pos: "to" + str(pos),
-                True,
+                False,
                 lambda self, pos: int(self.tilt()) + pos
                 ],
         "get": ["to",
-                r"\s(?P<expected> ?\d+)\r\n"
+                r"\s*(?P<expected>-*?\d+)\r\n"
                 ]
     }
 }
@@ -94,10 +122,10 @@ def position_decorator(cls):
                     logger.info("Blocking to get value: {}".format(checking_value))
                     while True:
                         value = func()
-                        logger.debug("Value read: {}".format(value))
                         if int(value) != checking_value:
                             time.sleep(.1)
                         else:
+                            logger.info("Value read: {}".format(value))
                             break
             else:
                 if getter_valid:
@@ -124,18 +152,19 @@ class PTU:
 
     def send_command(self, command):
         self.stream.send(command)
-        self.stream.read_until("*")
+        self.stream.read_until("\n")
 
     def read_command(self, command, regex):
         self.stream.send(command)
         data = self.stream.read_until("*").decode()
+        print(data)
         data = self.stream.read_until("\n").decode()
         match = re.match(regex, data)
         print(data)
         if match:
             return match.group("expected")
         else:
-            logger.error("Error parsing regex")
+            logger.error("Error parsing regex of")
 
     def pan_angle(self, angle_value=False):
         if type(angle_value) !=  bool:
