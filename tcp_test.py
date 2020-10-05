@@ -3,7 +3,12 @@
 from flir_ptu.ptu import PTU
 from vision_utils.logger import get_logger
 import time
+import rospy
+from sensor_msgs.msg import JointState
 logger =  get_logger()
+
+rospy.init_node("PTU_node")
+pub = rospy.Publisher('joint_states', JointState, queue_size=1)
 
 x = PTU("192.168.0.110", 4000, debug=False)
 x.connect()
@@ -26,24 +31,17 @@ x.wait()
 x.pan_accel()
 x.wait()
 
-# demo of different speeds
-for speed in [2000, 4000, 8000, 16000]:
-    x.pan_speed()
-    x.pan_speed(speed)
-    x.wait()
+joint_msg = JointState()
+joint_msg.name = ["ptu_panner", "ptu_tilter"]
 
-    x.pan_angle(-90)
-    x.wait()
-
-    x.pan_offset(-100)
-    x.wait()
-
-    x.pan_offset(100)
-    x.wait()
-
-    x.pan_angle(90)
-    x.wait()
-
-    time.sleep(1)
+rate = rospy.Rate(50) # 10hz
+while not rospy.is_shutdown():
+    joint_msg.header.stamp = rospy.Time()
+    joint_msg.position = [x.pan_angle(),x.tilt_angle()]
+    pub.publish(joint_msg)
+    # hello_str = "hello world %s" % rospy.get_time()
+    # rospy.loginfo(hello_str)
+    # pub.publish(hello_str)
+    rate.sleep()
 
 x.stream.close()

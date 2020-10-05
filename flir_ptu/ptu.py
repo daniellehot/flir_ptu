@@ -157,10 +157,10 @@ class PTU:
     def read_command(self, command, regex):
         self.stream.send(command)
         data = self.stream.read_until("*").decode()
-        print(data)
+        # print(data)
         data = self.stream.read_until("\n").decode()
         match = re.match(regex, data)
-        print(data)
+        # print(data)
         if match:
             return match.group("expected")
         else:
