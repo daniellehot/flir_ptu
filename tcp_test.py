@@ -10,7 +10,7 @@ logger =  get_logger()
 rospy.init_node("PTU_node")
 pub = rospy.Publisher('joint_states', JointState, queue_size=1)
 
-x = PTU("192.168.0.110", 4000, debug=False)
+x = PTU("192.168.1.110", 4000, debug=False)
 x.connect()
 
 # reset PTU
@@ -36,8 +36,12 @@ joint_msg.name = ["ptu_panner", "ptu_tilter"]
 
 rate = rospy.Rate(50) # 10hz
 while not rospy.is_shutdown():
-    joint_msg.header.stamp = rospy.Time()
-    joint_msg.position = [x.pan_angle(),x.tilt_angle()]
+    joint_msg.header.stamp = rospy.Time.now()
+
+    pan_angle = x.pan_angle()*(np.pi/180)
+    tilt_angle = x.tilt_angle()*(np.pi/180)
+
+    joint_msg.position = [pan_angle,tilt_angle]
     pub.publish(joint_msg)
     # hello_str = "hello world %s" % rospy.get_time()
     # rospy.loginfo(hello_str)
