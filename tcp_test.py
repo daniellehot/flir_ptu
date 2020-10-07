@@ -5,9 +5,11 @@ from vision_utils.logger import get_logger
 import time
 import rospy
 from sensor_msgs.msg import JointState
+import numpy as np
+
 logger =  get_logger()
 
-rospy.init_node("PTU_node")
+rospy.init_node("ptu_joint_states_node")
 pub = rospy.Publisher('joint_states', JointState, queue_size=1)
 
 x = PTU("192.168.1.110", 4000, debug=False)
@@ -16,11 +18,6 @@ x.connect()
 # reset PTU
 x.reset()
 x.wait()
-
-# having fun with sines
-import numpy as np
-sin = np.arcsin(np.arange(-1,1.0,0.01)) * 180/np.pi
-sin_inv = np.arcsin(np.arange(1.0,-1,0.01)) * 180/np.pi
 
 # set upper speed limit
 x.pan_speed_max()
@@ -31,10 +28,13 @@ x.wait()
 x.pan_accel()
 x.wait()
 
+x.pan(1000)
+x.wait()
+
 joint_msg = JointState()
 joint_msg.name = ["ptu_panner", "ptu_tilter"]
 
-rate = rospy.Rate(50) # 10hz
+rate = rospy.Rate(50) # 50hz
 while not rospy.is_shutdown():
     joint_msg.header.stamp = rospy.Time.now()
 
