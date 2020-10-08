@@ -111,7 +111,7 @@ def position_decorator(cls):
         def template(self, *args):
             if len(args):
                 cmd = send_string(*args)
-                logger.info("Send command: {}".format(cmd))
+                # logger.info("Send command: {}".format(cmd))
                 self.send_command(send_string(*args))
                 if wait_completion:
                     func = getattr(self, key)
