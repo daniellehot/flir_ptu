@@ -58,6 +58,18 @@ cmds = {
                 r"\s*(?P<expected>-*?\d+)\r\n"
                 ]
     },
+    "tilt_speed": {
+        "set": [lambda pos: "ts" + str(pos), False, False],
+        "get": ["ts",
+                r"\s*(?P<expected>-*?\d+)\r\n"
+                ]
+    },
+    "tilt_speed_max": {
+        "set": [lambda pos: "tu" + str(pos), False, False],
+        "get": ["tu",
+                r"\s*(?P<expected>-*?\d+)\r\n"
+                ]
+    },
     "pan_speed_max": {
         "set": [lambda pos: "pu" + str(pos), False, False],
         "get": ["pu",
