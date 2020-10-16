@@ -19,16 +19,29 @@ x.wait()
 x.pan_accel()
 x.wait()
 
-x.tilt_speed()
-x.tilt_speed(2000)
-x.wait()
+# x.tilt_speed()
+# x.tilt_speed(2000)
+# x.wait()
 
-x.tilt_angle(-25)
-x.wait()
+# x.pan_speed()
+# x.pan_speed(2000)
+# x.wait()
+
+# x.set_speed_mode()
+# x.wait()
+
+# x.set_position_mode()
+# x.wait()
+
+# x.tilt_angle(-25)
+# x.wait()
+
+
 
 position = [0.0, 0.0]
 
 angle = 0
+tilt_angle = 0
 
 def state_cb(msg):
     global position
@@ -38,7 +51,12 @@ def state_cb(msg):
 def angle_cb(msg):
     global angle
     angle = msg.data
-    print("angle data: ",msg.data)
+    print("pan angle: ", angle)
+
+def tilt_angle_cb(msg):
+    global tilt_angle
+    tilt_angle = msg.data
+    print("tilt angle: ", tilt_angle)
 
 import rospy
 from simple_pid import PID
@@ -49,22 +67,35 @@ from std_msgs.msg import Float32
 
 rospy.init_node("PTU_node")
 rospy.Subscriber("/joint_states", JointState, state_cb)
-rospy.Subscriber("/person_angle", Float32, angle_cb)
+rospy.Subscriber("/ref_pan_angle", Float32, angle_cb)
+rospy.Subscriber("/ref_tilt_angle", Float32, tilt_angle_cb)
 
-pid = PID(0.2, 0.5, 1, setpoint=0)
+pid_pan = PID(0.2, 0.5, 1, setpoint=0)
+pid_tilt = PID(0.2, 0.5, 1, setpoint=0)
 
-v = position[0]*180/np.pi
-pid.output_limits = (-168.0,168.0)
+v_pan = position[0]*180/np.pi
+v_tilt = position[1]*180/np.pi
 
-rate = rospy.Rate(50) # 50hz
+pid_pan.output_limits = (-168.0, 168.0)
+pid_tilt.output_limits = (-30, 90)
+
+# rate = rospy.Rate(50) # 50hz
+pid_pan.sample_time = 0.02
+pid_tilt.sample_time = 0.02
 while not rospy.is_shutdown():
-    pid.setpoint = angle
-    control = pid(v)
+    pid_pan.setpoint = angle
+    control_pan = pid_pan(v_pan)
 
-    print(round(control,0))
-    x.pan_angle(round(control,0))
-    v = int(round(position[0]*180/np.pi,0))
+    pid_tilt.setpoint = tilt_angle
+    control_tilt = pid_tilt(v_tilt)
 
-    rate.sleep()
+    x.pan_angle(round(control_pan, 0))
+    v_pan = position[0]*180/np.pi
+
+    x.tilt_angle(round(control_tilt,0))
+    v_tilt = position[1]*180/np.pi
+
+
+
 
 x.stream.close()

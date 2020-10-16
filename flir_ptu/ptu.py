@@ -98,12 +98,21 @@ cmds = {
                 ]
     },
     "tilt_offset": {
-        "set": [lambda pos: "to" + str(pos),
-                False,
-                lambda self, pos: int(self.tilt()) + pos
-                ],
+        "set": [lambda pos: "to" + str(pos), False, lambda self, pos: int(self.tilt()) + pos],
         "get": ["to",
                 r"\s*(?P<expected>-*?\d+)\r\n"
+                ]
+    },
+    "set_speed_mode": {
+        "set": [lambda pos: "cv", False, False],
+        "get": ["cv",
+                r"\s*(?P<expected>.*)\r\n"
+                ]
+    },
+    "set_position_mode": {
+        "set": [lambda pos: "df", False, False],
+        "get": ["df",
+                r"\s*(?P<expected>.*)\r\n"
                 ]
     }
 }
