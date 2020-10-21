@@ -43,10 +43,10 @@ x.wait()
 
 position = [0.0, 0.0]
 
-pan_old_angle = 0
-pan_angle = 0
-tilt_angle = 0
-tilt_old_angle = 0
+pan_old_angle = 200
+pan_angle = 200
+tilt_angle = 200
+tilt_old_angle = 200
 
 
 def state_cb(msg):
@@ -91,10 +91,8 @@ while not rospy.is_shutdown():
     logger.debug(pan_angle)
 
     if -180 <= pan_angle <= 180:
-        pid_pan.setpoint = pan_angle
+        
         pan_old_angle = pan_angle
-
-        pid_tilt.setpoint = tilt_angle
         tilt_old_angle = tilt_angle
 
         x.pan_speed(int(control_pan))
@@ -111,7 +109,8 @@ while not rospy.is_shutdown():
         x.tilt_speed(0)
         logger.warning("Invaild angle")
     
-    
+    pid_pan.setpoint = pan_angle
+    pid_tilt.setpoint = tilt_angle
 
 
     
