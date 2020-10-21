@@ -94,7 +94,7 @@ tu = 5.2
 
 [kp,ki,kd] = tune_gain(ku,tu,"noovershoot")
 
-pid_pan = PID(kp, 2, kd, setpoint=0)
+pid_pan = PID(kp, 0, kd-280, setpoint=45)
 # pid_tilt = PID(100, 0, 0, setpoint=0)
 
 v_pan = position[0]*180/np.pi
@@ -110,11 +110,13 @@ while not rospy.is_shutdown():
 
     ref = 45
     error = ref - v_pan
+    # print("Error: ", error)
     if abs(error) < 3:
         v_pan = ref
         
-    pid_pan.setpoint = ref
+    # pid_pan.setpoint = ref
     control_pan = pid_pan(v_pan)
+    # print("Control: ", control_pan)
     # print("Control: ",int(control_pan))
     # control_tilt = pid_tilt(v_tilt)
     x.pan_speed(int(control_pan))
