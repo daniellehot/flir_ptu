@@ -110,8 +110,8 @@ cmds = {
                 ]
     },
     "set_position_mode": {
-        "set": [lambda pos: "df", False, False],
-        "get": ["df",
+        "set": [lambda pos: "ci", False, False],
+        "get": ["ci",
                 r"\s*(?P<expected>.*)\r\n"
                 ]
     }
