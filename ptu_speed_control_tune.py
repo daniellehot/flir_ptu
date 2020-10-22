@@ -59,6 +59,13 @@ x.wait()
 # x.tilt_angle(-25)
 # x.wait()
 
+X = np.linspace(-np.pi, np.pi, num=1000)
+
+# numpy sine values
+y = np.sin(x) * 180/np.pi
+
+
+
 
 position = [0.0, 0.0]
 
@@ -88,13 +95,14 @@ rospy.init_node("PTU_node")
 rospy.Subscriber("/joint_states", JointState, state_cb)
 rospy.Subscriber("/ref_pan_angle", Float32, angle_cb)
 rospy.Subscriber("/ref_tilt_angle", Float32, tilt_angle_cb)
+pub = rospy.Publisher("/control_output", Float32, queue_size=1)
 
 ku = 1100
 tu = 5.2
 
 [kp,ki,kd] = tune_gain(ku,tu,"noovershoot")
 
-pid_pan = PID(kp, 0, kd-280, setpoint=45)
+pid_pan = PID(kp, ki-30, kd-200, setpoint=45)
 # pid_tilt = PID(100, 0, 0, setpoint=0)
 
 v_pan = position[0]*180/np.pi
@@ -116,10 +124,16 @@ while not rospy.is_shutdown():
         
     # pid_pan.setpoint = ref
     control_pan = pid_pan(v_pan)
+  
     # print("Control: ", control_pan)
     # print("Control: ",int(control_pan))
     # control_tilt = pid_tilt(v_tilt)
-    x.pan_speed(int(control_pan))
+    if abs(error) >= 3:
+        x.pan_speed(int(control_pan))
+        pub.publish(control_pan)
+    else:
+        x.pan_speed(0)
+        pub.publish(0)
 
     # x.tilt_speed(int(control_tilt))
     
