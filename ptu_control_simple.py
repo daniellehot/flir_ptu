@@ -15,30 +15,8 @@ x.connect()
 x.pan_speed_max(16000)
 x.wait()
 
-# read accel
-x.pan_accel()
-x.wait()
-
-# x.tilt_speed()
-# x.tilt_speed(2000)
-# x.wait()
-
-# x.pan_speed()
-# x.pan_speed(2000)
-# x.wait()
-
-# x.set_speed_mode()
-# x.wait()
-
 x.set_position_mode()
 x.wait()
-
-# x.pan_angle(45)
-# x.wait()
-
-# x.tilt_angle(-25)
-# x.wait()
-
 
 
 position = [0.0, 0.0]
@@ -61,24 +39,7 @@ def tilt_angle_cb(msg):
     tilt_angle = msg.data
     print("tilt angle: ", tilt_angle)
 
-# def tune_gain(ku, tu, mode="clasic"):
-#     if mode == "clasic":
-#         # clasic PID
-#         print("Clasic")
-#         kp = 0.6 * Ku
-#         ki = 1.2 * Ku /Tu
-#         kd = 3 * Ku * Tu / 40
-#     elif mode == "noovershoot":
-#         print("No Over Shoot")
-#         # No overshoot
-#         kp = Ku / 5
-#         ki = (2/5)*Ku / Tu
-#         kd = Ku * Tu / 15
-#     else:
-#         print("invaild mdoe")
 
-#     print("kp: ", kp, "ki: ", ki , "kd: ", kd)
-#     return [kp, ki, kd]
 
 import rospy
 # from simple_pid import PID
@@ -92,50 +53,58 @@ rospy.init_node("PTU_node")
 rospy.Subscriber("/joint_states", JointState, state_cb)
 rospy.Subscriber("/ref_pan_angle", Float32, angle_cb)
 rospy.Subscriber("/ref_tilt_angle", Float32, tilt_angle_cb)
+pub = rospy.Publisher("/control_output_pan", Float32, queue_size=1)
+pub_tilt = rospy.Publisher("/control_output_tilt", Float32, queue_size=1)
 
-# Ku = 9
-# Tu = 3.6
 
-# [kp, ki, kd] = tune_gain(Ku,Tu,"noovershoot")
-
-# pid_pan = PID(kp, ki-0.2, kd, setpoint=0)
-# pid_tilt = PID(0.2, 0, 0, setpoint=0)
 
 v_pan = position[0]*180/np.pi
-# v_tilt = position[1]*180/np.pi
+v_tilt = position[1]*180/np.pi
 
-# pid_pan.output_limits = (-167.0, 167.0)
-# pid_tilt.output_limits = (-29, 90)
+
 
 x.set_speed_mode()
 x.wait()
 
+X = np.linspace(-np.pi*4, np.pi*4, num=4000)
 
-# rate = rospy.Rate(50) # 50hz
-# pid_pan.sample_time = 0.02
-# pid_tilt.sample_time = 0.02
+# numpy sine values
+y = np.sin(X) * 180/np.pi
+counter = 0
+rate = rospy.Rate(50)
+
 while not rospy.is_shutdown():
-    
-    ref = angle
+    # if counter < len(y):
+    #     ref = y[counter]
+    #     counter += 1
+    ref = 45
+    tilt_ref = -30
+
+
     error = ref - v_pan
-    if abs(error) < 3:
-        ref = v_pan
+    error_tilt = tilt_ref - v_tilt
 
-    # pid_pan.setpoint = ref
-    # control_pan = pid_pan(v_pan)
-    # print(control_pan)
+    pub.publish(ref)
 
-    x.pan_angle(ref)
+    if abs(error) >= 3:
+        x.pan_angle(ref)
 
-    # pid_tilt.setpoint = 0
-    # control_tilt = pid_tilt(v_tilt)
+    pub.publish(ref)
+
+
+    if abs(error_tilt) >= 3:
+        x.tilt_angle(tilt_ref)
+        
+    pub_tilt.publish(tilt_ref)
+
+
 
     # x.pan_angle(control_pan)
     v_pan = position[0]*180/np.pi
 
     # x.tilt_angle(control_tilt)
-    # v_tilt = position[1]*180/np.pi
-
+    v_tilt = position[1]*180/np.pi
+    rate.sleep()
 
 
 
