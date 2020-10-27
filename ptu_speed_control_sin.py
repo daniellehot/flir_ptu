@@ -96,7 +96,7 @@ rospy.init_node("PTU_node")
 rospy.Subscriber("/joint_states", JointState, state_cb)
 rospy.Subscriber("/ref_pan_angle", Float32, angle_cb)
 rospy.Subscriber("/ref_tilt_angle", Float32, tilt_angle_cb)
-pub = rospy.Publisher("/control_output", Float32, queue_size=1)
+pub = rospy.Publisher("/angle_ref", Float32, queue_size=1)
 
 ku = 1100
 tu = 5.2
