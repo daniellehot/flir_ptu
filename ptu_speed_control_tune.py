@@ -62,7 +62,7 @@ x.wait()
 X = np.linspace(-np.pi, np.pi, num=1000)
 
 # numpy sine values
-y = np.sin(x) * 180/np.pi
+y = np.sin(X) * 180/np.pi
 
 
 
