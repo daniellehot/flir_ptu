@@ -37,9 +37,6 @@ while not rospy.is_shutdown():
 
     joint_msg.position = [pan_angle,tilt_angle]
     pub.publish(joint_msg)
-    # hello_str = "hello world %s" % rospy.get_time()
-    # rospy.loginfo(hello_str)
-    # pub.publish(hello_str)
     rate.sleep()
 
 x.stream.close()
