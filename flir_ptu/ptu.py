@@ -114,12 +114,6 @@ cmds = {
         "get": ["ci",
                 r"\s*(?P<expected>.*)\r\n"
                 ]
-    },
-    "set_baud_rate": {
-        "set": [lambda pos: "@(19200,0,F)", False, False],
-        "get": ["",
-                r"\s*(?P<expected>.*)\r\n"
-                ]
     }
 }
 
