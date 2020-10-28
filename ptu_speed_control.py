@@ -40,6 +40,21 @@ x.wait()
 # x.tilt_angle(-25)
 # x.wait()
 
+def tune_gain(Ku, Tu, mode="clasic"):
+    if mode == "clasic":
+        # clasic PID
+        print("Clasic")
+        kp = 0.6 * Ku
+        ki = 1.2 * Ku / Tu
+        kd = 3 * Ku * Tu / 40
+    elif mode == "noovershoot":
+        print("No Over Shoot")
+        # No overshoot
+        kp = Ku / 5
+        ki = (2/5)*Ku / Tu
+        kd = Ku * Tu / 15
+    else:
+        print("invaild mdoe")
 
 position = [0.0, 0.0]
 
@@ -71,10 +86,11 @@ rospy.init_node("PTU_node")
 rospy.Subscriber("/joint_states", JointState, state_cb)
 rospy.Subscriber("/ref_pan_angle", Float32, angle_cb)
 rospy.Subscriber("/ref_tilt_angle", Float32, tilt_angle_cb)
-pub = rospy.Publisher("/control_output", Float32, queue_size=1)
+pub = rospy.Publisher("/angle_ref", Float32, queue_size=1)
+pub_tilt = rospy.Publisher("/tilt_angle_ref", Float32, queue_size=1)
 
-pid_pan = PID(100, 0, 0, setpoint=0)
-pid_tilt = PID(100, 0, 0, setpoint=0)
+pid_pan = PID(400, 54.62, 181.33, setpoint=0)
+pid_tilt = PID(150, 0, 0, setpoint=0)
 
 v_pan = position[0]*180/np.pi
 v_tilt = position[1]*180/np.pi
@@ -82,41 +98,65 @@ v_tilt = position[1]*180/np.pi
 # pid_pan.output_limits = (-168.0, 168.0)
 # pid_tilt.output_limits = (-30, 90)
 
-# rate = rospy.Rate(50) # 50hz
-pid_pan.sample_time = 0.02
-pid_tilt.sample_time = 0.02
+rate = rospy.Rate(50) # 50hz
+pid_pan.sample_time = 0.01
+pid_tilt.sample_time = 0.01
+
+tilt_ref = 200
+ref = 200
 while not rospy.is_shutdown():
     control_pan = pid_pan(v_pan)
     control_tilt = pid_tilt(v_tilt)
     
-    logger.debug(pan_angle)
+    if -180 < pan_angle < 180:
+        ref = pan_angle
+
+    if -65 < tilt_angle < 10:
+        tilt_ref = tilt_angle + 5
+
+    error = ref - v_pan
+    error_tilt = tilt_ref - v_tilt
+
+
+
+    # logger.debug(pan_angle)
 
     if -180 <= pan_angle <= 180:
         
         pan_old_angle = pan_angle
         tilt_old_angle = tilt_angle
 
-        x.pan_speed(int(control_pan))
-        x.tilt_speed(int(control_tilt))
+        if abs(error) >= 5:
+            x.pan_speed(int(control_pan))
+        else:
+            x.pan_speed(0)
 
-        print("set pan angle: ",pan_angle)
-        print("set tilt angle: ",pan_angle)
-        print("Control input tilt speed: ", v_tilt)
-        print("Control tilt speed: ", control_tilt)
+        if abs(error_tilt) >= 5:
+            x.tilt_speed(int(control_tilt))
+        else:
+            x.tilt_speed(0)
+
+        pub.publish(ref)
+        pub_tilt.publish(tilt_ref)
+        # print("set pan angle: ",pan_angle)
+        # print("set tilt angle: ",pan_angle)
+        # print("Control input tilt speed: ", v_tilt)
+        # print("Control tilt speed: ", control_tilt)
     else:
         pan_angle = pan_old_angle
         tilt_angle = tilt_old_angle
         x.pan_speed(0)
         x.tilt_speed(0)
         logger.warning("Invaild angle")
+
+
     
     pid_pan.setpoint = pan_angle
     pid_tilt.setpoint = tilt_angle
-
-
     
     v_pan = position[0]*180/np.pi   
     v_tilt = position[1]*180/np.pi
+    rate.sleep()
 
 
 x.stream.close()
