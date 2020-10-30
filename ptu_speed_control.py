@@ -23,22 +23,8 @@ x.wait()
 x.pan_accel()
 x.wait()
 
-
-
-
 x.set_speed_mode()
 x.wait()
-
-# x.tilt_speed(2000)
-
-# x.pan_speed(2000)
-
-
-# x.set_position_mode()
-# x.wait()
-
-# x.tilt_angle(-25)
-# x.wait()
 
 def tune_gain(Ku, Tu, mode="clasic"):
     if mode == "clasic":
@@ -138,10 +124,6 @@ while not rospy.is_shutdown():
 
         pub.publish(ref)
         pub_tilt.publish(tilt_ref)
-        # print("set pan angle: ",pan_angle)
-        # print("set tilt angle: ",pan_angle)
-        # print("Control input tilt speed: ", v_tilt)
-        # print("Control tilt speed: ", control_tilt)
     else:
         pan_angle = pan_old_angle
         tilt_angle = tilt_old_angle
