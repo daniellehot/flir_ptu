@@ -27,7 +27,7 @@ from sensor_msgs.msg import JointState
 joint_msg = JointState()
 joint_msg.name = ["ptu_panner", "ptu_tilter"]
 rospy.init_node("ptu_joint_states_node")
-pub = rospy.Publisher('joint_states', JointState, queue_size=10)
+pub = rospy.Publisher('joint_states', JointState, queue_size=1)
 
 rate = rospy.Rate(50) # 50hz
 while not rospy.is_shutdown():
