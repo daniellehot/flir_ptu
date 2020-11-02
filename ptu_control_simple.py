@@ -2,7 +2,7 @@
 import numpy as np
 from flir_ptu.ptu import PTU
 from vision_utils.logger import get_logger
-import time 
+import time
 logger =  get_logger()
 
 x = PTU("192.168.1.110", 4000, debug=False)
@@ -60,6 +60,7 @@ rospy.Subscriber("/ref_tilt_angle", Float32, tilt_angle_cb)
 pub = rospy.Publisher("/angle_ref", Float32, queue_size=1)
 pub_tilt = rospy.Publisher("/tilt_angle_ref", Float32, queue_size=1)
 not_move_pub = rospy.Publisher("/ptu_not_moving", Bool, queue_size=1)
+noperson_pub = rospy.Publisher("/noperson", Bool, queue_size=1)
 
 
 v_pan = position[0]*180/np.pi
@@ -78,21 +79,25 @@ moving_left= True
 moving_right = True
 tilt_first = True
 time_before_search = 2
+
+MAX_PAN = 30
+MIN_PAN = -90
+
 while not rospy.is_shutdown():
-    
+
 
     if angle < person_not_detected:
         #If a person is detected and is within the joint limits, move pan joint
         last_human_angle = angle
-        angle = max(-90, angle)
-        angle = min(90, angle)
-        
+        angle = max(MIN_PAN, angle)
+        angle = min(MAX_PAN, angle)
+
         ref = angle
         #Calculate the error and move the joint if its outside the threshold
         error = ref - v_pan
         if abs(error) >= 5:
             x.pan_angle(ref)
-    
+
     if tilt_angle < person_not_detected:
     #If a person is detected and is within the joint limits, move tilt joint
         tilt_angle = max(-28, tilt_angle)
@@ -118,11 +123,12 @@ while not rospy.is_shutdown():
             x.pan_speed(1000)
             x.wait()
         if time.time() - time_old > time_before_search:
+            noperson_pub.publish(True)
             if tilt_first:
                 x.tilt_angle(-10)
                 tilt_first = False
             if  last_human_angle < 0:
-                ref = -45
+                ref = max(-45,MIN_PAN)
                 error = ref - v_pan
                 if abs(error) >= 3:
                     if moving_left:
@@ -131,9 +137,9 @@ while not rospy.is_shutdown():
                         moving_left = False
                 else:
                     moving_left = True
-                    last_human_angle = 45
+                    last_human_angle = min(45,MAX_PAN)
             else:
-                ref = 45
+                ref = MAX_PAN
                 error = ref - v_pan
                 if abs(error) >= 3:
                     if moving_right:
@@ -142,8 +148,9 @@ while not rospy.is_shutdown():
                         moving_right = False
                 else:
                     moving_right = True
-                    last_human_angle = -45        
+                    last_human_angle = max(-45,MIN_PAN)
     else:
+        noperson_pub.publish(False)
         first = True
         moving_right = True
         moving_left = True
@@ -154,7 +161,7 @@ while not rospy.is_shutdown():
             speed_first = False
 
 
-    #Read the newest joint angle position and convert it to degress  
+    #Read the newest joint angle position and convert it to degress
     v_pan_old = v_pan
     v_tilt_old = v_tilt
 
