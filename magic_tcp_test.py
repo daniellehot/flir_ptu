@@ -18,27 +18,37 @@ sin = np.arcsin(np.arange(-1,1.0,0.01)) * 180/np.pi
 sin_inv = np.arcsin(np.arange(1.0,-1,0.01)) * 180/np.pi
 
 # set upper speed limit
-x.pan_speed_max(16000)
+x.pan_speed_max(11000)
+x.wait()
+
+x.set_position_mode()
+x.wait()
+
+x.pan_speed(1000)
+x.wait()
+
+x.tilt_speed(1000)
 x.wait()
 
 # demo of different speeds
-for speed in [2000, 4000, 8000, 16000]:
-    x.pan_speed()
-    x.pan_speed(speed)
-    x.wait()
+for i in range(20):
 
-    x.pan_angle(-90)
-    x.wait()
+    x.pan_angle(-25)
+    time.sleep(2)
 
-    x.pan_offset(-100)
-    x.wait()
+    x.tilt_angle(5)
+    time.sleep(2)
 
-    x.pan_offset(100)
-    x.wait()
+    x.pan_angle(0)
+    time.sleep(2)
 
-    x.pan_angle(90)
-    x.wait()
+    x.tilt_angle(-10)
+    time.sleep(2)
 
-    time.sleep(1)
+    x.pan_angle(25)
+    time.sleep(2)
+
+    x.tilt_angle(-20)
+    time.sleep(2)
 
 x.stream.close()
