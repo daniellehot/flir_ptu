@@ -83,6 +83,9 @@ time_before_search = 2
 MAX_PAN = 30
 MIN_PAN = -90
 
+pan_tolerance = 10
+tilt_tolerance = 5
+
 while not rospy.is_shutdown():
 
 
@@ -95,7 +98,7 @@ while not rospy.is_shutdown():
         ref = angle
         #Calculate the error and move the joint if its outside the threshold
         error = ref - v_pan
-        if abs(error) >= 5:
+        if abs(error) >= pan_tolerance:
             x.pan_angle(ref)
 
     if tilt_angle < person_not_detected:
@@ -105,7 +108,7 @@ while not rospy.is_shutdown():
         tilt_ref = tilt_angle
         #Calculate the error and move the joint if its outside the threshold
         error_tilt = tilt_ref - v_tilt
-        if abs(error_tilt) >= 3:
+        if abs(error_tilt) >= tilt_tolerance:
             x.tilt_angle(tilt_ref)
 
     #Publish the ref input to the PTU
@@ -130,7 +133,7 @@ while not rospy.is_shutdown():
             if  last_human_angle < 0:
                 ref = max(-45,MIN_PAN)
                 error = ref - v_pan
-                if abs(error) >= 3:
+                if abs(error) >= tilt_tolerance:
                     if moving_left:
                         print("moving left")
                         x.pan_angle(ref)
@@ -141,7 +144,7 @@ while not rospy.is_shutdown():
             else:
                 ref = MAX_PAN
                 error = ref - v_pan
-                if abs(error) >= 3:
+                if abs(error) >= pan_tolerance:
                     if moving_right:
                         print("moving right")
                         x.pan_angle(ref)
