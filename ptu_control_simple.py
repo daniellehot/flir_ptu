@@ -78,7 +78,7 @@ person_not_detected = 200
 moving_left= True
 moving_right = True
 tilt_first = True
-time_before_search = 2
+time_before_search = 5
 
 MAX_PAN = 30
 MIN_PAN = -90
