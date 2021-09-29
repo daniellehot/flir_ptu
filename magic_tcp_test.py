@@ -3,7 +3,7 @@
 from flir_ptu.ptu import PTU
 from vision_utils.logger import get_logger
 import time
-logger =  get_logger()
+# logger =  get_logger()
 
 x = PTU("192.168.1.110", 4000, debug=False)
 x.connect()
