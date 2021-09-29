@@ -3,8 +3,8 @@ import re
 import time
 import math
 from flir_ptu.stream import Stream
-from vision_utils.logger import get_logger
-logger =  get_logger()
+# from vision_utils.logger import get_logger
+# logger =  get_logger()
 
 """
 The below are the config definitions that are used to autogenerate and add
@@ -140,19 +140,20 @@ def position_decorator(cls):
                         checking_value = value_mod_func(self, *args)
                     else:
                         checking_value = args[0]
-                    logger.info("Blocking to get value: {}".format(checking_value))
+                    # logger.info("Blocking to get value: {}".format(checking_value))
                     while True:
                         value = func()
                         if int(value) != checking_value:
                             time.sleep(.1)
                         else:
-                            logger.info("Value read: {}".format(value))
+                            # logger.info("Value read: {}".format(value))
                             break
             else:
                 if getter_valid:
                     return self.read_command(read_string, regex)
                 else:
-                    logger.warning("No valid getter command for {}".format(key))
+                    print("No valid getter command for {}".format(key))
+                    # logger.warning("No valid getter command for {}".format(key))
 
         setattr(cls, key, template)
 
@@ -185,7 +186,8 @@ class PTU:
         if match:
             return match.group("expected")
         else:
-            logger.error("Error parsing regex of")
+            print("Error parsing regex of")
+            # logger.error("Error parsing regex of")
 
     def pan_angle(self, angle_value=False):
         if type(angle_value) !=  bool:

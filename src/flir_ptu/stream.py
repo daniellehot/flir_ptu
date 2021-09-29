@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from telnetlib import Telnet
 from enum import IntEnum
-from vision_utils.logger import get_logger
-logger =  get_logger()
+# from vision_utils.logger import get_logger
+# logger =  get_logger()
 
 
 class ConnectionState(IntEnum):
@@ -24,7 +24,7 @@ class Stream:
 
     def connect(self):
         if self.testing:
-            logger.debug("Connected")
+            # logger.debug("Connected")
             self.state = ConnectionState.CONNECTED
             return
 
@@ -36,9 +36,10 @@ class Stream:
             self.socket = Telnet(self.host, self.port, self.timeout)
             data = self.socket.read_until(str.encode("*"))
             self.state = ConnectionState.CONNECTED
-            logger.info(data)
+            # logger.info(data)
         except OSError:
-            logger.critical("Socket connection error")
+            print("Socket connection error")
+            # logger.critical("Socket connection error")
 
     @property
     def is_connected(self):
@@ -51,7 +52,7 @@ class Stream:
 
     def close(self):
         if self.testing:
-            logger.debug("Closed")
+            # logger.debug("Closed")
             return
 
         if not self.is_connected:
@@ -69,7 +70,8 @@ class Stream:
         try:
             self.socket.write(cmd.encode("ascii") + b'\n')
         except OSError:
-            logger.error("Error sending data")
+            print("Error sending data")
+            # logger.error("Error sending data")
 
     def read(self):
         self.ensure_connection()
@@ -82,7 +84,7 @@ class Stream:
 
     def read_until(self, string):
         if self.testing:
-            logger.debug("Reading")
+            # logger.debug("Reading")
             return
 
         self.ensure_connection()

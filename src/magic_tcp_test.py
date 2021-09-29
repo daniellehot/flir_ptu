@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flir_ptu.ptu import PTU
-from vision_utils.logger import get_logger
+# from vision_utils.logger import get_logger
 import time
 # logger =  get_logger()
 
