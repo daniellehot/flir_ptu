@@ -1,33 +1,29 @@
 #!/usr/bin/env python3
-
 from flir_ptu.ptu import PTU
-# from vision_utils.logger import get_logger
 import time
-#  logger =  get_logger()
+import numpy as np
+import rospy
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Float32
 
+
+position = [0.0, -60.0]
+
+rospy.init_node("ptu_joint_states_node")
 
 x = PTU("192.168.1.110", 4000, debug=False)
 x.stream.close()
 x.connect()
-
-
-# reset PTU
 x.reset()
 x.wait()
-
-import numpy as np
-# set upper speed limit
-x.pan_speed_max(16000)
+x.set_position_mode()
 x.wait()
+#x.pan_angle(position[0])
+x.tilt_angle(position[1])
 
-
-import rospy
-from sensor_msgs.msg import JointState
-
+pub = rospy.Publisher('joint_states', JointState, queue_size=1)
 joint_msg = JointState()
 joint_msg.name = ["ptu_panner", "ptu_tilter"]
-rospy.init_node("ptu_joint_states_node")
-pub = rospy.Publisher('joint_states', JointState, queue_size=1)
 
 rate = rospy.Rate(50) # 50hz
 while not rospy.is_shutdown():
