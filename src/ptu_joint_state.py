@@ -12,8 +12,8 @@ x.connect()
 
 
 # reset PTU
-x.reset()
-x.wait()
+# x.reset()
+# x.wait()
 
 import numpy as np
 # set upper speed limit

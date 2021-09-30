@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
 from flir_ptu.ptu import PTU
-from vision_utils.logger import get_logger
+# from vision_utils.logger import get_logger
 import time
-logger =  get_logger()
+# logger =  get_logger()
 
 x = PTU("192.168.1.110", 4000, debug=False)
 x.connect()
@@ -48,7 +48,7 @@ def tilt_angle_cb(msg):
 import rospy
 # from simple_pid import PID
 from sensor_msgs.msg import JointState
-from vision_utils.logger import get_logger
+# from vision_utils.logger import get_logger
 import numpy as np
 from std_msgs.msg import Float32, Bool
 
