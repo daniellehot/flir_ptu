@@ -7,7 +7,7 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Float32
 
 
-position = [0.0, -60.0]
+position = [0.0, -63.0]
 
 rospy.init_node("ptu_joint_states_node")
 
