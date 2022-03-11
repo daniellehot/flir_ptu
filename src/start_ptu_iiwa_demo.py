@@ -6,7 +6,7 @@ import rospy
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float32
 
-position = [0.0, -63.0]
+position = [70.0, -63.0]
 
 rospy.init_node("ptu_joint_states_node")
 
@@ -17,10 +17,10 @@ x.reset()
 x.wait()
 x.set_position_mode()
 x.wait()
-#x.pan_angle(position[0])
+x.pan_angle(position[0])
 x.tilt_angle(position[1])
 
-pub = rospy.Publisher('joint_states', JointState, queue_size=1)
+pub = rospy.Publisher('ptu_joint_states_demo', JointState, queue_size=1)
 joint_msg = JointState()
 joint_msg.name = ["ptu_panner", "ptu_tilter"]
 
